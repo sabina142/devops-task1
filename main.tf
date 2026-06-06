@@ -17,7 +17,7 @@ resource "aws_vpc" "placemux_vpc" {
   enable_dns_hostnames = true
 
   tags = {
-    Name = "placemux-vpc"
+    Name        = "placemux-vpc"
     Environment = "dev"
   }
 }
@@ -81,7 +81,12 @@ resource "aws_security_group" "web_sg" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
-
+  ingress {
+    from_port   = 5432
+    to_port     = 5432
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
   egress {
     from_port   = 0
     to_port     = 0
@@ -91,4 +96,41 @@ resource "aws_security_group" "web_sg" {
 }
 resource "aws_secretsmanager_secret" "app_secret" {
   name = "placemux-app-secret"
+}
+resource "aws_db_subnet_group" "postgres_subnet_group" {
+  name = "placemux-postgres-subnet-group"
+
+  subnet_ids = [
+    aws_subnet.public_subnet.id,
+    aws_subnet.private_subnet.id
+  ]
+
+  tags = {
+    Name = "placemux-postgres-subnet-group"
+  }
+}
+
+resource "aws_db_instance" "dev_postgres" {
+  identifier = "placemux-dev-postgres"
+
+  engine         = "postgres"
+  engine_version = "15"
+
+  instance_class = "db.t3.micro"
+
+  allocated_storage = 20
+
+  db_name  = "placemux"
+  username = "postgres"
+  password = "Placemux123!"
+
+  publicly_accessible = true
+
+  skip_final_snapshot = true
+
+  db_subnet_group_name = aws_db_subnet_group.postgres_subnet_group.name
+
+  vpc_security_group_ids = [
+    aws_security_group.web_sg.id
+  ]
 }
