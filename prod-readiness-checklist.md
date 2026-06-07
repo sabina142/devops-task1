@@ -76,5 +76,5 @@
 
 Status: READY FOR PRODUCTION DRY RUN
 
-
+\- \[x] Smoke test passed (GET / returns 200 OK)
 
