@@ -1,21 +1,33 @@
-name: Terraform Infra
+name: Terraform CI
 
 on:
   push:
-    paths:
-      - 'terraform/**'
+    branches:
+      - main
+
   pull_request:
-    paths:
-      - 'terraform/**'
+    branches:
+      - main
 
 jobs:
   terraform:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - uses: hashicorp/setup-terraform@v3
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
 
-      - run: terraform init
-      - run: terraform validate
-      - run: terraform plan
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Format Check
+        run: terraform fmt -check
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Plan
+        run: terraform plan
