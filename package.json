@@ -10,3 +10,7 @@
     "express": "^4.19.2"
   }
 }
+
+"scripts": {
+  "test": "echo \"No tests yet\" && exit 0"
+}
